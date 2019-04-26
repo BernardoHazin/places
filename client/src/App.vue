@@ -2,24 +2,27 @@
   <div id="app">
     <v-app>
       <v-toolbar>
-        <v-toolbar-side-icon></v-toolbar-side-icon>
-        <img alt="Places logo" class="logo-img" src="./assets/logo.png">
-        <v-toolbar-title>Places</v-toolbar-title>
+        <img alt="Places logo" class="logo-img" src="./assets/logo.png" />
+        <v-toolbar-title class="hidden-sm-and-down">Places</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-toolbar-items class="hidden-sm-and-down">
-          <v-btn flat>Link One</v-btn>
-          <v-btn flat>Link Two</v-btn>
-          <v-btn flat>Link Three</v-btn>
+        <v-toolbar-items>
+          <v-btn flat @click="setSideComponent('login')">Entrar</v-btn>
+          <v-btn flat @click="setSideComponent('register')">Cadastrar-se</v-btn>
         </v-toolbar-items>
       </v-toolbar>
-      <!-- <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link>
-      </div> -->
       <router-view />
     </v-app>
   </div>
 </template>
+
+<script>
+import { setSideComponent } from '@/mixins'
+
+export default {
+  mixins: [setSideComponent]
+}
+</script>
+
 
 <style lang="stylus">
 #app
@@ -27,11 +30,16 @@
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
   text-align center
-  color #2c3e50
 
 .logo-img
   border-radius 50%
   width 35px
+
+.fade-enter-active, .fade-leave-active
+  transition opacity 0.2s
+
+.fade-enter, .fade-leave-to /* .fade-leave-active em versões anteriores a 2.1.8 */
+  opacity 0
 
 ::-webkit-scrollbar
   width 3px

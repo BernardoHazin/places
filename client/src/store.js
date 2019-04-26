@@ -5,12 +5,16 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-
+    sideComponent: 'search'
   },
   mutations: {
-
+    setSideComponent(state, component) {
+      state.sideComponent = component
+    }
   },
   actions: {
-
+    setSideComponent({ commit }, component) {
+      commit('setSideComponent', component)
+    }
   }
 })
