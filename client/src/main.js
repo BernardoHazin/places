@@ -6,8 +6,16 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import { createProvider } from './vue-apollo'
+import * as VueGoogleMaps from 'vue2-google-maps'
 
 Vue.config.productionTip = false
+
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyBKNe_-6v1cLtGUjfNSsiNz4K6nnde2sUk',
+    libraries: 'places' // This is required if you use the Autocomplete plugin
+  }
+})
 
 new Vue({
   router,
