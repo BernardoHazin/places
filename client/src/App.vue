@@ -1,6 +1,12 @@
 <template>
   <div id="app">
     <v-app>
+      <notifications
+        :classes="'notification'"
+        color="red"
+        position="top center"
+        :duration="6000"
+      />
       <v-toolbar>
         <img alt="Places logo" class="logo-img" src="./assets/logo.png" />
         <v-toolbar-title class="hidden-sm-and-down">Places</v-toolbar-title>
@@ -19,7 +25,10 @@
 import { setSideComponent } from '@/mixins'
 
 export default {
-  mixins: [setSideComponent]
+  mixins: [setSideComponent],
+  mounted() {
+    this.$notify('Test')
+  }
 }
 </script>
 
@@ -30,6 +39,26 @@ export default {
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
   text-align center
+
+.notification
+  padding 10px
+  margin 10px
+  font-size 14px
+  color #ffffff
+  background #44A4FC !important
+  border-left 5px solid #187FE7
+
+  &.warn
+    background #ffb648
+    border-left-color #f48a06
+
+  &.error
+    background #E54D42
+    border-left-color #B82E24
+
+  &.success
+    background #68CD86
+    border-left-color #42A85F
 
 .logo-img
   border-radius 50%
