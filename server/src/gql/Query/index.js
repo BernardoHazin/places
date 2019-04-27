@@ -35,7 +35,8 @@ module.exports = {
     const isPasswordValid = await user.comparePassword(password)
     if (!isPasswordValid) new Error('Email ou senha incorretos')
     return {
-      email: user.email
+      email: user.email,
+      profileImg: user.profileImg
     }
   }
 }

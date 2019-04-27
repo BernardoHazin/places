@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING(128).BINARY,
         allowNull: false
+      },
+      profileImg: {
+        type: DataTypes.STRING(128).BINARY
       }
     },
     {
