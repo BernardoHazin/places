@@ -1,6 +1,6 @@
-module.exports =  `
+module.exports = `
   type User {
-    username: String!
+    email: String!
     password: String!
     createdAt: String!
     updatedAt: String! 

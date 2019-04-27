@@ -11,6 +11,7 @@ const { makeExecutableSchema } = require('graphql-tools')
 const { execute, subscribe } = require('graphql')
 const { SubscriptionServer } = require('subscriptions-transport-ws')
 const { typeDefs, resolvers } = require('./gql')
+const consola = require('consola')
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -42,6 +43,6 @@ models.sequelize.sync({ force: true }).then(() => {
         path: '/subscriptions'
       }
     )
-    console.log('Server started at', config.port)
+    consola.success(`Server started at ${config.port}`)
   })
 })

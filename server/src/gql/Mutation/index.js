@@ -1,11 +1,9 @@
 const pubsub = require('../PubSub')
+
 module.exports = {
-  createUser: async (parent, args, { models }) => {
-    const user = await models.User.create(args)
-    const users = await models.User.findAll()
-    pubsub.publish('userAdded', {
-      userAdded: users
-    })
-    return user
+  registerUser: async (parent, args, { models }) => {
+    return models.User.create(args)
+      .then(({ email }) => email)
+      .catch(err => new Error('Unable to register'))
   }
 }

@@ -2,10 +2,6 @@ const { GOOGLE_API_KEY } = require('../../config/')
 const fetch = require('node-fetch')
 
 module.exports = {
-  allUsers: async (parent, args, { models }) => {
-    const users = await models.User.findAll()
-    return users
-  },
   getPlace: async (parent, { place, lat, lng }, { models }) => {
     let url = new URL(
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'

@@ -1,5 +1,5 @@
 module.exports = `
   type Mutation {
-    createUser(username: String!, password: String!): User!
+    registerUser(email: String!, password: String!): User!
   }
 `
