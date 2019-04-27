@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       email: {
         type: DataTypes.STRING(128).BINARY,
+        unique: true,
         allowNull: false
       },
       password: {

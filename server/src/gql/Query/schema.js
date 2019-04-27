@@ -1,5 +1,6 @@
 module.exports = `
   type Query {
-    getPlace(place: String!, lat: Float, lng: Float, ): [Place]
+    getPlace(place: String!, radius: Int!, lat: Float, lng: Float, ): [Place]
+    login(email: String!, password: String!): User!
   }
 `
