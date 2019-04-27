@@ -1,5 +1,11 @@
 <template>
   <div class="col">
+    <v-slider
+      v-model="range"
+      :label="`Raio ${range}km`"
+      :max="50"
+      class="pa-1"
+    ></v-slider>
     <v-text-field
       box
       v-model="searchPlace"
@@ -15,6 +21,8 @@
         @click="$emit('setPlace', place.position)"
       >
         {{ place.name }}
+        <v-spacer />
+        <img width="20px" :src="place.icon" />
       </v-list-tile>
     </v-list>
   </div>
@@ -30,12 +38,16 @@ export default {
   },
   data() {
     return {
-      searchPlace: ''
+      searchPlace: '',
+      range: 10
     }
   },
   watch: {
     searchPlace: debounce(function(val) {
-      this.$emit('search', val)
+      if (val) this.$emit('search', val, this.range)
+    }, 300),
+    range: debounce(function(val) {
+      if (this.searchPlace) this.$emit('search', this.searchPlace, val)
     }, 300)
   }
 }

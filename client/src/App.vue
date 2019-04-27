@@ -53,8 +53,10 @@ export default {
 
 
 <style lang="stylus">
+@import url('https://fonts.googleapis.com/css?family=Poppins')
+
 #app
-  font-family 'Avenir', Helvetica, Arial, sans-serif
+  font-family 'Poppins', Helvetica, Arial, sans-serif
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
   text-align center
