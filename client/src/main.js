@@ -16,7 +16,7 @@ Vue.use(Notifications)
 Vue.use(VueGoogleMaps, {
   load: {
     key: process.env.VUE_APP_GOOGLE_API_KEY,
-    libraries: 'places,directions' // This is required if you use the Autocomplete plugin
+    libraries: 'places' // This is required if you use the Autocomplete plugin
   }
 })
 

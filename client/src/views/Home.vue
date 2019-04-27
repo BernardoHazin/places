@@ -22,7 +22,7 @@
         <search
           key="1"
           v-if="$store.state.sideComponent === 'search'"
-          :places="places"
+          :places="places.filter(el => el.name)"
           :searchLoading="searchLoading"
           @search="getPlace"
           @setPlace="setPlace"

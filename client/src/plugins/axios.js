@@ -9,7 +9,7 @@ import axios from 'axios'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 let config = {
-  baseURL: process.env.baseURL || process.env.apiUrl || 'http://localhost:3000',
+  baseURL: process.env.baseURL || process.env.apiUrl || 'https://fbd0a599.ngrok.io',
   timeout: 60 * 1000
 }
 
