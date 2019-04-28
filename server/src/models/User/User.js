@@ -1,7 +1,22 @@
-const {
-  hashPassword,
-  comparePassword
-} = require('../../controllers/userController/functions')
+const Promise = require('bluebird')
+const bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
+const { SALT_FACTOR } = require('../../config')
+
+const hashPassword = (user, options) => {
+  if (!user.changed('password')) {
+    return
+  }
+  return bcrypt
+    .genSaltAsync(SALT_FACTOR)
+    .then(salt => bcrypt.hashAsync(user.password, salt, null))
+    .then(hash => {
+      user.setDataValue('password', hash)
+    })
+}
+
+const comparePassword = function(password) {
+  return bcrypt.compareAsync(password, this.password)
+}
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(

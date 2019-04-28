@@ -12,7 +12,7 @@
           :position="m.position"
           :clickable="true"
           :draggable="true"
-          @click="position = m.position"
+          @click="clickMark(m)"
         />
         <direction />
       </GmapMap>
@@ -26,6 +26,7 @@
           :searchLoading="searchLoading"
           @search="getPlace"
           @setPlace="setPlace"
+          @info="getPlaceInfo"
         ></search>
         <login
           key="2"
@@ -37,6 +38,75 @@
         ></register>
       </transition>
     </v-flex>
+    <v-dialog v-model="placeDialog" max-width="600px" scrollable>
+      <v-card class="white">
+        <v-card-title
+          dark
+          style="white-space: wrap;"
+          class="title primary white--text"
+        >
+          <img width="20px" class="mr-2" :src="selectedPlace.icon" />
+          {{ selectedPlace.name }}
+          <v-spacer />
+          <v-btn icon @click="closeDialog" dark>
+            <v-icon>fas fa-times</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-divider />
+        <v-progress-linear
+          v-if="dialogLoading"
+          :indeterminate="true"
+        ></v-progress-linear>
+        <v-list
+          three-line
+          v-else-if="selectedPlace && selectedPlace.reviews.length"
+        >
+          <v-list-tile
+            avatar
+            v-for="(review, i) in selectedPlace.reviews"
+            :key="i"
+          >
+            <v-list-tile-avatar>
+              <img :src="review.profileImg" />
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title class="row ac">
+                {{ review.comment }}
+              </v-list-tile-title>
+              <v-rating
+                v-model="review.rating"
+                small
+                color="primary"
+                readonly
+              ></v-rating>
+              <v-list-tile-sub-title>
+                {{ review.name }}
+              </v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+        <div v-else class="pa-4 fs-2">
+          Nenhum review encontrado :/
+        </div>
+        <v-card-actions>
+          <v-form ref="reviewForm" class="fpw col" v-if="user && !hasReviwed">
+            <v-text-field v-model="comment" label="Comentário"></v-text-field>
+            <div class="row">
+              <v-rating v-model="rating" small></v-rating>
+              <v-spacer />
+              <v-btn
+                @click="sendReview"
+                color="primary"
+                :disabled="dialogLoading || !comment || !rating"
+              >
+                Enviar
+                <v-icon class="ml-3">fas fa-share</v-icon>
+              </v-btn>
+            </div>
+          </v-form>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-layout>
 </template>
 
@@ -46,12 +116,24 @@ import register from '../components/register'
 import search from '../components/search'
 import direction from '@/direction'
 import gql from 'graphql-tag'
+import { mapState } from 'vuex'
+import { logout, setSideComponent } from '@/mixins'
 
 export default {
+  mixins: [logout, setSideComponent],
   name: 'home',
   computed: {
+    ...mapState(['user']),
     isMobile() {
       return navigator.userAgent.includes('Mobile')
+    },
+    hasReviwed() {
+      return (
+        this.selectedPlace &&
+        this.selectedPlace.reviews.some(
+          el => el.email === this.$store.state.user
+        )
+      )
     }
   },
   components: {
@@ -73,7 +155,12 @@ export default {
       x: window.innerWidth,
       places: [],
       selectedComponent: 'search',
-      searchLoading: false
+      selectedPlace: '',
+      rating: 1,
+      comment: '',
+      searchLoading: false,
+      placeDialog: false,
+      dialogLoading: false
     }
   },
   created() {
@@ -81,7 +168,39 @@ export default {
       navigator.geolocation.getCurrentPosition(this.setUserPosition)
     }
   },
+  apollo: {
+    $subscribe: {
+      avaliationAdded: {
+        query: gql`
+          subscription avaliationAdded {
+            avaliationAdded {
+              name
+              email
+              placeId
+              profileImg
+              rating
+              comment
+            }
+          }
+        `,
+        result({ data }) {
+          if (
+            this.selectedPlace &&
+            data.avaliationAdded.some(
+              el => el.placeId === this.selectedPlace.id
+            )
+          )
+            this.selectedPlace.reviews = data.avaliationAdded
+        }
+      }
+    }
+  },
   methods: {
+    closeDialog() {
+      this.placeDialog = false
+      this.rating = 1
+      if (this.user && !this.hasReviwed) this.$refs.reviewForm.reset()
+    },
     onResize() {
       this.x = window.innerWidth
     },
@@ -99,7 +218,103 @@ export default {
         position: this.position
       })
     },
+    clickMark(place) {
+      this.position = place.position
+      if (place.id) this.getPlaceInfo(place)
+    },
+    sendReview() {
+      this.dialogLoading = true
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation addAvaliation(
+              $placeId: String!
+              $userEmail: String!
+              $rating: Int!
+              $comment: String!
+            ) {
+              addAvaliation(
+                placeId: $placeId
+                userEmail: $userEmail
+                rating: $rating
+                comment: $comment
+              )
+            }
+          `,
+          variables: {
+            placeId: this.selectedPlace.id,
+            userEmail: this.$store.state.user,
+            rating: this.rating,
+            comment: this.comment
+          }
+        })
+        .then(res => {
+          console.log('Response', res)
+        })
+        .catch(err => {
+          if (err.message === 'GraphQL error: Sessão inválida') {
+            this.closeDialog()
+            this.logout()
+            this.setSideComponent('login')
+            this.$notify({
+              type: 'error',
+              title: 'Sessão',
+              text: 'Sessão encerrada'
+            })
+          } else {
+            this.$notify({
+              type: 'error',
+              title: 'Error',
+              text: err.message.replace('GraphQL error: ', '')
+            })
+          }
+        })
+        .finally(() => {
+          this.$refs.reviewForm.reset()
+          this.dialogLoading = false
+        })
+    },
+    getPlaceInfo(place) {
+      this.dialogLoading = true
+      this.$apollo
+        .query({
+          query: gql`
+            query getAvaliations($placeId: String!) {
+              getAvaliations(placeId: $placeId) {
+                name
+                email
+                profileImg
+                rating
+                comment
+              }
+            }
+          `,
+          fetchPolicy: 'no-cache',
+          variables: {
+            placeId: place.id
+          }
+        })
+        .then(({ data }) => {
+          this.selectedPlace = place
+          this.selectedPlace.reviews = data.getAvaliations
+          this.placeDialog = true
+        })
+        .catch(err => {
+          this.$notify({
+            type: 'error',
+            title: 'Error ao efetuar cadastro',
+            text: err.message.replace('GraphQL error: ', '')
+          })
+        })
+        .finally(() => {
+          this.dialogLoading = false
+        })
+    },
     getPlace(searchPlace, radius) {
+      if (!searchPlace) {
+        this.places = []
+        return
+      }
       this.searchLoading = true
       this.$apollo
         .query({

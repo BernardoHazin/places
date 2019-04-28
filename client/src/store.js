@@ -8,6 +8,8 @@ export default new Vuex.Store({
   plugins: [createPersistedState({ storage: window.sessionStorage })],
   state: {
     user: '',
+    name: '',
+    profileImg: '',
     token: '',
     sideComponent: 'search'
   },
@@ -15,10 +17,11 @@ export default new Vuex.Store({
     setSideComponent(state, component) {
       state.sideComponent = component
     },
-    login(state, { email, token }) {
-      console.log('store email', email)
+    login(state, { email, token, profileImg, name }) {
       state.user = email
+      state.name = name
       state.token = token
+      state.profileImg = profileImg
       state.sideComponent = 'search'
     },
     logout(state) {

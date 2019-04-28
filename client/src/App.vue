@@ -10,11 +10,10 @@
       <v-toolbar>
         <img alt="Places logo" class="logo-img" src="./assets/logo.png" />
         <v-toolbar-title class="hidden-sm-and-down">
-          Places <span v-if="user">- {{ user }}</span>
+          Places <span v-if="user">- {{ name }}</span>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items class="row ac">
-          <v-btn flat @click="test">teste</v-btn>
           <v-btn v-if="!user" flat @click="setSideComponent('login')"
             >Entrar</v-btn
           >
@@ -38,49 +37,7 @@ import gql from 'graphql-tag'
 export default {
   mixins: [setSideComponent, setUser, logout],
   computed: {
-    ...mapState(['user'])
-  },
-  mounted() {
-    FB.getLoginStatus(this.fbLoginStatus)
-  },
-  methods: {
-    fbLoginStatus({ status, authResponse }) {
-      console.log('Auth response', authResponse)
-      if (status === 'connected') {
-        FB.api('/me', { fields: 'name, email' }, res =>
-          this.setUser(res, authResponse.accessToken)
-        )
-      }
-    },
-    test() {
-      this.$apollo
-        .mutate({
-          mutation: gql`
-            mutation addAvaliation(
-              $placeId: String!
-              $userEmail: String!
-              $rating: Int!
-            ) {
-              addAvaliation(
-                placeId: $placeId
-                userEmail: $userEmail
-                rating: $rating
-              )
-            }
-          `,
-          variables: {
-            placeId: 'cscsdcsdcsc',
-            userEmail: 'bernardo.hazin@gmail.com',
-            rating: 4
-          }
-        })
-        .then(res => {
-          console.log('Response', res)
-        })
-        .catch(err => {
-          console.log('Err', err.message)
-        })
-    }
+    ...mapState(['user', 'name'])
   }
 }
 </script>

@@ -1,4 +1,4 @@
-const fs = require('fs')
+/* const fs = require('fs')
 const path = require('path')
 const resolver = {}
 let schema = ``
@@ -38,6 +38,12 @@ schema += subscriptions
 
 // console.log(schema)
 // console.log(resolver)
+ */
 
-module.exports.typeDefs = schema
-module.exports.resolvers = resolver
+const fs = require('fs')
+const path = require('path')
+
+module.exports.typeDefs = fs.readFileSync(path.resolve(__dirname, './schema.graphql'), {
+  encoding: 'utf8'
+})
+module.exports.resolvers = require('./resolver')

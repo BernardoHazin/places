@@ -12,7 +12,12 @@
       :loading="searchLoading"
       label="Procure um lugar!"
     ></v-text-field>
-    <v-list class="transparent" two-line style="max-height: 60vh; overflow: auto;" dense>
+    <v-list
+      class="transparent"
+      two-line
+      style="max-height: 60vh; overflow: auto;"
+      dense
+    >
       <v-list-tile
         v-for="(place, i) in places"
         :key="i"
@@ -22,18 +27,11 @@
         <img width="20px" :src="place.icon" />
         <div class="ml-1">{{ place.name }}</div>
         <v-spacer />
-        <v-rating
-          v-model="place.rating"
-          half-increments
-          small
-          readonly
-        ></v-rating>
-        <v-btn small icon @click.self="$emit('info')">
+        <v-btn small icon @click="$emit('info', place)">
           <v-icon color="primary">fas fa-info-circle</v-icon>
         </v-btn>
       </v-list-tile>
     </v-list>
-    <v-dialog v-model="infoDialog"></v-dialog>
   </div>
 </template>
 
@@ -47,14 +45,13 @@ export default {
   },
   data() {
     return {
-      infoDialog: false,
       searchPlace: '',
       range: 10
     }
   },
   watch: {
     searchPlace: debounce(function(val) {
-      if (val) this.$emit('search', val, this.range)
+      this.$emit('search', val, this.range)
     }, 300),
     range: debounce(function(val) {
       if (this.searchPlace) this.$emit('search', this.searchPlace, val)
