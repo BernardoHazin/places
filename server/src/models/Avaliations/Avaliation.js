@@ -22,5 +22,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   })
 
+  Avaliation.associate = function(models) {
+    // Set Associations
+    Avaliation.belongsTo(models.User, { foreignKey: 'user' })
+  }
+
   return Avaliation
 }

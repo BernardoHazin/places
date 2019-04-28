@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         allowNull: false
       },
+      name: {
+        type: DataTypes.STRING(128).BINARY,
+        allowNull: false
+      },
       password: {
         type: DataTypes.STRING(128).BINARY,
         allowNull: false

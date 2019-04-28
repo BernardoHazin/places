@@ -1,7 +1,15 @@
 const { GOOGLE_API_KEY } = require('../../config/')
 const fetch = require('node-fetch')
+const { authentication } = require('../../config/')
+const { sign } = require('jsonwebtoken')
+const gravatar = require('gravatar')
+const FB = require('../../fb')
 
-const authenticateUser = (user, password) => user.comparePassword(password)
+function signJWT(user) {
+  return sign({ user }, authentication.secret, {
+    expiresIn: authentication.expiration
+  })
+}
 
 module.exports = {
   getPlace: async (parent, { place, lat, lng, radius }, { models }) => {
@@ -36,7 +44,37 @@ module.exports = {
     if (!isPasswordValid) new Error('Email ou senha incorretos')
     return {
       email: user.email,
+      token: signJWT(user.email),
       profileImg: user.profileImg
     }
+  },
+  fbLogin: async (parent, { accessToken }, { models }) => {
+    const { email, name } = await new Promise((resolve, reject) => {
+      FB.api('/me', { fields: 'email,name', access_token: accessToken }, res =>
+        resolve(res)
+      )
+    })
+    if (email && name) {
+      return models.User.findOrCreate({
+        where: {
+          email,
+          name
+        },
+        attributes: {
+          exclude: ['password']
+        },
+        defaults: {
+          password: '-',
+          profileImg: gravatar.url(
+            email,
+            { s: '200', r: 'x', d: 'retro' },
+            true
+          )
+        }
+      }).then(([{ dataValues }]) => ({
+        ...dataValues,
+        token: signJWT(dataValues.email)
+      }))
+    } else return new Error('Não foi possível realizar a autenticação')
   }
 }

@@ -100,7 +100,6 @@ export default {
       })
     },
     getPlace(searchPlace, radius) {
-      this.position = this.userPosition
       this.searchLoading = true
       this.$apollo
         .query({
@@ -125,20 +124,22 @@ export default {
           variables: {
             place: searchPlace,
             radius: radius,
-            lat: this.position.lat,
-            lng: this.position.lng
+            lat: this.userPosition.lat,
+            lng: this.userPosition.lng
           }
         })
         .then(({ data }) => {
           console.log('Result!', data)
           if (data.getPlace.length > 0) {
             this.places = data.getPlace.map(el => ({
+              id: el.id,
               position: {
                 lat: el.lat,
                 lng: el.lng
               },
               name: el.name,
-              icon: el.icon
+              icon: el.icon,
+              rating: Number(el.rating)
             }))
             this.position = this.places[0].position
           } else this.places = []

@@ -14,6 +14,7 @@
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items class="row ac">
+          <v-btn flat @click="test">teste</v-btn>
           <v-btn v-if="!user" flat @click="setSideComponent('login')"
             >Entrar</v-btn
           >
@@ -32,6 +33,7 @@
 <script>
 import { setSideComponent, setUser, logout } from '@/mixins'
 import { mapState } from 'vuex'
+import gql from 'graphql-tag'
 
 export default {
   mixins: [setSideComponent, setUser, logout],
@@ -39,13 +41,45 @@ export default {
     ...mapState(['user'])
   },
   mounted() {
-    FB.getLoginStatus(this.fbLogin)
+    FB.getLoginStatus(this.fbLoginStatus)
   },
   methods: {
-    fbLogin({ status, authResponse }) {
+    fbLoginStatus({ status, authResponse }) {
+      console.log('Auth response', authResponse)
       if (status === 'connected') {
-        FB.api('/me', { fields: 'name, email' }, this.setUser)
+        FB.api('/me', { fields: 'name, email' }, res =>
+          this.setUser(res, authResponse.accessToken)
+        )
       }
+    },
+    test() {
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation addAvaliation(
+              $placeId: String!
+              $userEmail: String!
+              $rating: Int!
+            ) {
+              addAvaliation(
+                placeId: $placeId
+                userEmail: $userEmail
+                rating: $rating
+              )
+            }
+          `,
+          variables: {
+            placeId: 'cscsdcsdcsc',
+            userEmail: 'bernardo.hazin@gmail.com',
+            rating: 4
+          }
+        })
+        .then(res => {
+          console.log('Response', res)
+        })
+        .catch(err => {
+          console.log('Err', err.message)
+        })
     }
   }
 }

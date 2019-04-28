@@ -8,8 +8,9 @@ export const setSideComponent = {
 
 export const setUser = {
   methods: {
-    setUser({ email }) {
-      this.$store.dispatch('login', { user: email })
+    setUser({ email, name }, accessToken) {
+      console.log(email, name)
+      this.$store.dispatch('login', { email, token: accessToken })
     }
   }
 }

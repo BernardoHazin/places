@@ -1,4 +1,3 @@
-const op = require('./sequelizeOperators')
 require('dotenv').config()
 
 module.exports = {
@@ -14,8 +13,11 @@ module.exports = {
       host: process.env.HOST || 'localhost',
       port: process.env.PORT || 3306,
       storage: './safe.lite',
-      logging: false,
-      operatorsAliases: op
+      logging: false
     }
+  },
+  authentication: {
+    secret: process.env.SECRET,
+    expiration: 60 * 60
   }
 }
