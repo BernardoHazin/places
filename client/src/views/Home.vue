@@ -66,6 +66,10 @@ export default {
         lat: 0,
         lng: 0
       },
+      userPosition: {
+        lat: 0,
+        lng: 0
+      },
       x: window.innerWidth,
       places: [],
       selectedComponent: 'search',
@@ -86,22 +90,27 @@ export default {
       this.position = val
     },
     setUserPosition(position) {
-      this.position = {
+      this.userPosition = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       }
-      console.log(this.position)
+      this.position = this.userPosition
       this.places.push({
         position: this.position
       })
     },
-    getPlace(searchPlace) {
+    getPlace(searchPlace, radius) {
       this.searchLoading = true
       this.$apollo
         .query({
           query: gql`
-            query getPlace($place: String!, $lat: Float, $lng: Float) {
-              getPlace(place: $place, lat: $lat, lng: $lng) {
+            query getPlace(
+              $place: String!
+              $radius: Int!
+              $lat: Float
+              $lng: Float
+            ) {
+              getPlace(place: $place, radius: $radius, lat: $lat, lng: $lng) {
                 id
                 icon
                 name
@@ -114,22 +123,26 @@ export default {
           `,
           variables: {
             place: searchPlace,
-            lat: this.position.lat,
-            lng: this.position.lng
+            radius: radius,
+            lat: this.userPosition.lat,
+            lng: this.userPosition.lng
           }
         })
         .then(({ data }) => {
           console.log('Result!', data)
           if (data.getPlace.length > 0) {
             this.places = data.getPlace.map(el => ({
+              id: el.id,
               position: {
                 lat: el.lat,
                 lng: el.lng
               },
-              name: el.name
+              name: el.name,
+              icon: el.icon,
+              rating: Number(el.rating)
             }))
             this.position = this.places[0].position
-          }
+          } else this.places = []
         })
         .catch(err => {
           console.log('Err', err.message)

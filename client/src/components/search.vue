@@ -1,22 +1,39 @@
 <template>
   <div class="col">
+    <v-slider
+      v-model="range"
+      :label="`Raio ${range}km`"
+      :max="50"
+      class="pa-1"
+    ></v-slider>
     <v-text-field
       box
       v-model="searchPlace"
       :loading="searchLoading"
-      :disabled="searchLoading"
       label="Procure um lugar!"
     ></v-text-field>
-    <v-list class="transparent" style="max-height: 60vh; overflow: auto;" dense>
+    <v-list class="transparent" two-line style="max-height: 60vh; overflow: auto;" dense>
       <v-list-tile
         v-for="(place, i) in places"
         :key="i"
         style="cursor: pointer;"
-        @click="$emit('setPlace', place.position)"
+        @click.self="$emit('setPlace', place.position)"
       >
-        {{ place.name }}
+        <img width="20px" :src="place.icon" />
+        <div class="ml-1">{{ place.name }}</div>
+        <v-spacer />
+        <v-rating
+          v-model="place.rating"
+          half-increments
+          small
+          readonly
+        ></v-rating>
+        <v-btn small icon @click.self="$emit('info')">
+          <v-icon color="primary">fas fa-info-circle</v-icon>
+        </v-btn>
       </v-list-tile>
     </v-list>
+    <v-dialog v-model="infoDialog"></v-dialog>
   </div>
 </template>
 
@@ -30,12 +47,17 @@ export default {
   },
   data() {
     return {
-      searchPlace: ''
+      infoDialog: false,
+      searchPlace: '',
+      range: 10
     }
   },
   watch: {
     searchPlace: debounce(function(val) {
-      this.$emit('search', val)
+      if (val) this.$emit('search', val, this.range)
+    }, 300),
+    range: debounce(function(val) {
+      if (this.searchPlace) this.$emit('search', this.searchPlace, val)
     }, 300)
   }
 }

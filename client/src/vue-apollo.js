@@ -1,19 +1,14 @@
 import Vue from 'vue'
 import VueApollo from 'vue-apollo'
-import {
-  createApolloClient,
-  restartWebsockets
-} from 'vue-cli-plugin-apollo/graphql-client'
+import store from './store'
+import { createApolloClient } from 'vue-cli-plugin-apollo/graphql-client'
 
 // Install the vue plugin
 Vue.use(VueApollo)
 
-// Name of the localStorage item
-const AUTH_TOKEN = 'apollo-token'
-
 // Http endpoint
 const httpEndpoint =
-  process.env.VUE_APP_GRAPHQL_HTTP || 'https://fbd0a599.ngrok.io/graphql'
+  process.env.VUE_APP_GRAPHQL_HTTP || 'http://localhost:3000/graphql'
 
 // Config
 const defaultOptions = {
@@ -21,16 +16,17 @@ const defaultOptions = {
   httpEndpoint,
   // You can use `wss` for secure connection (recommended in production)
   // Use `null` to disable subscriptions
-  wsEndpoint: process.env.VUE_APP_GRAPHQL_WS || 'ws://localhost:3000/subscriptions',
+  wsEndpoint:
+    process.env.VUE_APP_GRAPHQL_WS || 'ws://localhost:3000/subscriptions',
   // LocalStorage token
-  tokenName: AUTH_TOKEN,
+  tokenName: store.state.token,
   // Enable Automatic Query persisting with Apollo Engine
   persisting: false,
   // Use websockets for everything (no HTTP)
   // You need to pass a `wsEndpoint` for this to work
   websocketsOnly: false,
   // Is being rendered on the server?
-  ssr: false
+  ssr: false,
 
   // Override default apollo link
   // note: don't override httpLink here, specify httpLink options in the
@@ -41,7 +37,9 @@ const defaultOptions = {
   // cache: myCache
 
   // Override the way the Authorization header is set
-  // getAuth: (tokenName) => ...
+  getAuth(tokenName) {
+    return `Bearer ${store.state.token}`
+  }
 
   // Additional ApolloClient options
   // apollo: { ... }

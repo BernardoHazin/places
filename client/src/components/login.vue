@@ -53,7 +53,47 @@ export default {
   },
   methods: {
     fblogin() {
-      FB.login(this.userInfo, { scope: 'email' })
+      FB.login(this.signInUser, { scope: 'email,public_profile' })
+    },
+    signInUser({ status, authResponse }) {
+      console.log(status, authResponse)
+      if (status === 'connected') {
+        this.loading = true
+        this.$apollo
+          .query({
+            query: gql`
+              query fbLogin($accessToken: String!) {
+                fbLogin(accessToken: $accessToken) {
+                  email
+                  token
+                  profileImg
+                }
+              }
+            `,
+            variables: {
+              accessToken: authResponse.accessToken
+            }
+          })
+          .then(({ data }) => {
+            console.log(data)
+            this.$store.dispatch('login', data.fbLogin)
+          })
+          .catch(err => {
+            this.$notify({
+              type: 'error',
+              title: 'Error ao efetuar login',
+              text: err.message.replace('GraphQL error: ', '')
+            })
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      } else
+        this.$notify({
+          type: 'error',
+          title: 'Error ao efetuar login',
+          text: err.message.replace('GraphQL error: ', '')
+        })
     },
     toLogin() {
       this.loading = true
@@ -63,6 +103,8 @@ export default {
             query login($email: String!, $password: String!) {
               login(email: $email, password: $password) {
                 email
+                token
+                profileImg
               }
             }
           `,
@@ -72,7 +114,7 @@ export default {
           }
         })
         .then(({ data }) => {
-          this.$store.dispatch('login', { user: data.login.email })
+          this.$store.dispatch('login', data.login)
         })
         .catch(err => {
           this.$notify({
