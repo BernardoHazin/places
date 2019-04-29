@@ -39,11 +39,11 @@
 </template>
 
 <script>
-import { setSideComponent, setUser } from '@/mixins'
+import { setSideComponent, setUser, logout } from '@/mixins'
 import gql from 'graphql-tag'
 
 export default {
-  mixins: [setSideComponent, setUser],
+  mixins: [setSideComponent, setUser, logout],
   data() {
     return {
       loading: false,
@@ -56,7 +56,6 @@ export default {
       FB.login(this.signInUser, { scope: 'email,public_profile' })
     },
     signInUser({ status, authResponse }) {
-      console.log(status, authResponse)
       if (status === 'connected') {
         this.loading = true
         this.$apollo
@@ -65,6 +64,7 @@ export default {
               query fbLogin($accessToken: String!) {
                 fbLogin(accessToken: $accessToken) {
                   email
+                  name
                   token
                   profileImg
                 }
@@ -79,11 +79,15 @@ export default {
             this.$store.dispatch('login', data.fbLogin)
           })
           .catch(err => {
-            this.$notify({
-              type: 'error',
-              title: 'Error ao efetuar login',
-              text: err.message.replace('GraphQL error: ', '')
-            })
+            if (err.message === 'GraphQL error: Sessão inválida') {
+              this.logout()
+            } else {
+              this.$notify({
+                type: 'error',
+                title: 'Error ao efetuar login',
+                text: err.message.replace('GraphQL error: ', '')
+              })
+            }
           })
           .finally(() => {
             this.loading = false
@@ -103,6 +107,7 @@ export default {
             query login($email: String!, $password: String!) {
               login(email: $email, password: $password) {
                 email
+                name
                 token
                 profileImg
               }

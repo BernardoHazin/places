@@ -16,6 +16,12 @@
         ></v-text-field>
         <v-text-field
           box
+          v-model="name"
+          :disabled="loading"
+          label="Name"
+        ></v-text-field>
+        <v-text-field
+          box
           v-model="password"
           :disabled="loading"
           :type="seePassword ? 'text' : 'password'"
@@ -45,6 +51,7 @@ export default {
     return {
       loading: false,
       seePassword: false,
+      name: '',
       email: '',
       password: ''
     }
@@ -55,14 +62,21 @@ export default {
       this.$apollo
         .mutate({
           mutation: gql`
-            mutation registerUser($email: String!, $password: String!) {
-              registerUser(email: $email, password: $password) {
+            mutation registerUser(
+              $email: String!
+              $name: String!
+              $password: String!
+            ) {
+              registerUser(email: $email, name: $name, password: $password) {
                 email
+                token
+                profileImg
               }
             }
           `,
           variables: {
             email: this.email,
+            name: this.name,
             password: this.password
           }
         })
@@ -72,7 +86,7 @@ export default {
             title: 'Cadastro',
             text: 'Cadastro realizado com suceeso!'
           })
-          this.$store.dispatch('login', { user: data.registerUser.email })
+          this.$store.dispatch('login', data.registerUser)
         })
         .catch(err => {
           this.$notify({

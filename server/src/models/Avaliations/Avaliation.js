@@ -9,10 +9,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(128).BINARY,
       allowNull: false
     },
-    userEmail: {
-      type: DataTypes.STRING(128).BINARY,
-      allowNull: false
-    },
     rating: {
       type: DataTypes.INTEGER,
       defaultValue: 0
@@ -24,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
 
   Avaliation.associate = function(models) {
     // Set Associations
-    Avaliation.belongsTo(models.User, { foreignKey: 'user' })
+    Avaliation.belongsTo(models.User, {
+      foreignKey: 'userEmail',
+      targetKey: 'email'
+    })
   }
 
   return Avaliation

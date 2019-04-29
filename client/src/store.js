@@ -7,7 +7,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   plugins: [createPersistedState({ storage: window.sessionStorage })],
   state: {
-    user: '',
+    email: '',
+    name: '',
+    profileImg: '',
     token: '',
     sideComponent: 'search'
   },
@@ -15,16 +17,23 @@ export default new Vuex.Store({
     setSideComponent(state, component) {
       state.sideComponent = component
     },
-    login(state, { email, token }) {
-      console.log('store email', email)
-      state.user = email
+    login(state, { email, token, profileImg, name }) {
+      state.email = email
+      state.name = name
       state.token = token
+      state.profileImg = profileImg
       state.sideComponent = 'search'
     },
     logout(state) {
-      state.user = ''
+      state.email = ''
       state.token = ''
       state.sideComponent = 'search'
+    },
+    setName(state, name) {
+      state.name = name
+    },
+    setToken(state, token) {
+      state.token = token
     }
   },
   actions: {
@@ -36,6 +45,12 @@ export default new Vuex.Store({
     },
     logout({ commit }) {
       commit('logout')
+    },
+    setName({ commit }, name) {
+      commit('setName', name)
+    },
+    setToken({ commit }, token) {
+      commit('setToken', token)
     }
   },
   getters: {

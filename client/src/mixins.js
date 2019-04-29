@@ -18,7 +18,7 @@ export const setUser = {
 export const logout = {
   methods: {
     logout() {
-      FB.logout(this.logout)
+      FB.logout(() => {})
       this.$store.dispatch('logout')
     }
   }
