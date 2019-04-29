@@ -14,7 +14,6 @@
           :draggable="true"
           @click="clickMark(m)"
         />
-        <direction />
       </GmapMap>
     </v-flex>
     <v-flex xs4 class="elevation-4">
@@ -111,7 +110,6 @@
 import login from '../components/login'
 import register from '../components/register'
 import search from '../components/search'
-import direction from '@/direction'
 import gql from 'graphql-tag'
 import { mapState } from 'vuex'
 import { logout, setSideComponent } from '@/mixins'
