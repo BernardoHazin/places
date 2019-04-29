@@ -34,6 +34,7 @@
           :loading="loading"
           append-icon="fas fa-pen"
           @keypress="changeName"
+          @blur="changeName"
         ></v-text-field>
         <v-btn
           color="primary"

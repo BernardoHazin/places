@@ -136,6 +136,27 @@ module.exports = {
         })
         .then(user => ({ name: user.name }))
     },
+    setFavorite: async (
+      parent,
+      { placeId, placeName, placeIcon },
+      { models, req }
+    ) => {
+      if (!req.user) return new Error('Sessão inválida')
+      return models.Favorite.findOrCreate({
+        where: {
+          user: req.user.id,
+          placeId
+        },
+        defaults: {
+          placeName,
+          placeIcon
+        }
+      }).then(([favorite, created]) => {
+        console.log(created)
+        if (!created) return favorite.destroy()
+        return favorite
+      })
+    },
     changePassword: async (
       parent,
       { password, newPassword },
@@ -179,11 +200,15 @@ module.exports = {
       if (!user) return new Error('Email ou senha incorretos')
       const isPasswordValid = await user.comparePassword(password)
       if (!isPasswordValid) new Error('Email ou senha incorretos')
+      const favorites = await models.Favorite.findAll({
+        where: { user: user.id }
+      })
       return {
         email: user.email,
         name: user.name,
         token: signJWT(user.id),
-        profileImg: user.profileImg
+        profileImg: user.profileImg,
+        favorites
       }
     },
     fbLogin: async (parent, { accessToken }, { models }) => {
@@ -211,10 +236,19 @@ module.exports = {
               true
             )
           }
-        }).then(([{ dataValues }]) => ({
-          ...dataValues,
-          token: signJWT(dataValues.id)
-        }))
+        }).then(async ([{ dataValues }, created]) => {
+          let favorites = []
+          if (!created) {
+            favorites = await models.Favorite.findAll({
+              where: { user: dataValues.id }
+            })
+          }
+          return {
+            ...dataValues,
+            token: signJWT(dataValues.id),
+            favorites
+          }
+        })
       } else return new Error('Não foi possível realizar a autenticação')
     },
     getAvaliations: async (parent, args, { models, req }) =>
