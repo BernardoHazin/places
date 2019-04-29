@@ -4,7 +4,7 @@
     :column="isMobile || x < 800"
     class="home pa-2 fph"
   >
-    <v-flex xs8 class="red">
+    <v-flex xs8 class="red" style="min-height: 50vh;">
       <GmapMap :center="position" :zoom="15" style="width: 100%; height: 100%;">
         <GmapMarker
           v-for="(m, index) in places"
@@ -82,7 +82,7 @@
           Nenhum review encontrado :/
         </div>
         <v-card-actions>
-          <v-form ref="reviewForm" class="fpw col" v-if="user && !hasReviwed">
+          <v-form ref="reviewForm" class="fpw col" v-if="email && !hasReviwed">
             <v-text-field v-model="comment" label="Comentário"></v-text-field>
             <div class="row">
               <v-rating v-model="rating" small></v-rating>
@@ -116,12 +116,12 @@ export default {
   mixins: [logout, setSideComponent],
   name: 'home',
   computed: {
-    ...mapState(['user']),
+    ...mapState(['email']),
     isMobile() {
       return navigator.userAgent.includes('Mobile')
     },
     hasReviwed() {
-      return this.reviews.some(el => el.email === this.$store.state.user)
+      return this.reviews.some(el => el.email === this.$store.state.email)
     }
   },
   components: {
@@ -173,6 +173,7 @@ export default {
           }
         `,
         result({ data }) {
+          if (this.email && !this.hasReviwed) this.$refs.reviewForm.reset()
           if (
             this.selectedPlace &&
             data.avaliationAdded.some(
@@ -188,7 +189,7 @@ export default {
     closeDialog() {
       this.placeDialog = false
       this.rating = 1
-      if (this.user && !this.hasReviwed) this.$refs.reviewForm.reset()
+      if (this.email && !this.hasReviwed) this.$refs.reviewForm.reset()
     },
     onResize() {
       this.x = window.innerWidth
@@ -232,7 +233,7 @@ export default {
           `,
           variables: {
             placeId: this.selectedPlace.id,
-            userEmail: this.$store.state.user,
+            userEmail: this.$store.state.email,
             rating: this.rating,
             comment: this.comment
           }
@@ -259,7 +260,7 @@ export default {
           }
         })
         .finally(() => {
-          if (this.user && !this.hasReviwed) this.$refs.reviewForm.reset()
+          if (this.email && !this.hasReviwed) this.$refs.reviewForm.reset()
           this.dialogLoading = false
         })
     },

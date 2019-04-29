@@ -11,11 +11,10 @@ passport.use(
       secretOrKey: authentication.secret
     },
     async (playload, done) => {
-      const user = playload.user
-      if (user) {
+      if (playload.id) {
         User.findOne({
           where: {
-            email: user
+            id: playload.id
           }
         })
           .then(fetched => {
@@ -27,7 +26,7 @@ passport.use(
           .catch(err => {
             return done(err, false)
           })
-      } else done(new Error(), false)
+      } else done(new Error('Invalid token'), false)
     }
   )
 )

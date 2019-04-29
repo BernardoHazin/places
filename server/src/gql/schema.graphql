@@ -9,6 +9,9 @@ type Query {
 
 type Mutation {
   registerUser(email: String!, name: String!, password: String!): User!
+  changeName(name: String!): User!
+  changePasswordRequest: String!
+  changePassword(password: String!, newPassword: String!): String!
   addAvaliation(
     placeId: String!
     userEmail: String!

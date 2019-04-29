@@ -14,7 +14,7 @@ const hashPassword = (user, options) => {
     })
 }
 
-const comparePassword = function(password) {
+const comparePassword = async function(password) {
   return bcrypt.compareAsync(password, this.password)
 }
 
@@ -52,6 +52,18 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   User.prototype.comparePassword = comparePassword
+
+  User.prototype.setNewPassword = function(newPassword) {
+    const SALT_FACTOR = 10
+    bcrypt
+      .genSaltAsync(SALT_FACTOR)
+      .then(salt => bcrypt.hashAsync(newPassword, salt, null))
+      .then(hash => {
+        this.update({
+          password: hash
+        })
+      })
+  }
 
   User.associate = function(models) {
     // Set Associations

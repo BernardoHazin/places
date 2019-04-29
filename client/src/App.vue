@@ -8,22 +8,30 @@
         :duration="6000"
       />
       <v-toolbar>
-        <img alt="Places logo" class="logo-img" src="./assets/logo.png" />
+        <img style="cursor: pointer;" @click="$router.push({ name: 'home' })" alt="Places logo" class="logo-img" src="./assets/logo.png" />
         <v-toolbar-title class="hidden-sm-and-down">
-          Places <span v-if="user">- {{ name }}</span>
+          Places <span v-if="email">- {{ name }}</span>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items class="row ac">
-          <v-btn v-if="!user" flat @click="setSideComponent('login')"
+          <v-btn v-if="!email" flat @click="setSideComponent('login')"
             >Entrar</v-btn
           >
-          <v-btn v-if="!user" flat @click="setSideComponent('register')"
+          <v-btn v-if="!email" flat @click="setSideComponent('register')"
             >Cadastrar-se</v-btn
           >
-          <v-btn v-if="user" flat>Perfil</v-btn>
-          <v-btn v-if="user" flat @click="logout">Sair</v-btn>
+          <v-btn v-if="email" flat @click="openProfile">Perfil</v-btn>
+          <v-btn v-if="email" flat @click="logout">Sair</v-btn>
         </v-toolbar-items>
       </v-toolbar>
+      <v-dialog v-model="profileDialog" max-width="600px" persistent>
+        <profile
+          :email="email"
+          :name="name"
+          :profileImg="profileImg"
+          @close="profileDialog = false"
+        />
+      </v-dialog>
       <router-view />
     </v-app>
   </div>
@@ -31,13 +39,27 @@
 
 <script>
 import { setSideComponent, setUser, logout } from '@/mixins'
+import profile from './components/profile'
 import { mapState } from 'vuex'
 import gql from 'graphql-tag'
 
 export default {
   mixins: [setSideComponent, setUser, logout],
+  components: {
+    profile
+  },
   computed: {
-    ...mapState(['user', 'name'])
+    ...mapState(['email', 'name', 'profileImg'])
+  },
+  data() {
+    return {
+      profileDialog: false
+    }
+  },
+  methods: {
+    openProfile() {
+      this.profileDialog = true
+    }
   }
 }
 </script>
