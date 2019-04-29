@@ -57,15 +57,8 @@
           v-if="dialogLoading"
           :indeterminate="true"
         ></v-progress-linear>
-        <v-list
-          three-line
-          v-else-if="selectedPlace && selectedPlace.reviews.length"
-        >
-          <v-list-tile
-            avatar
-            v-for="(review, i) in selectedPlace.reviews"
-            :key="i"
-          >
+        <v-list three-line v-else-if="selectedPlace && reviews.length">
+          <v-list-tile avatar v-for="(review, i) in reviews" :key="i">
             <v-list-tile-avatar>
               <img :src="review.profileImg" />
             </v-list-tile-avatar>
@@ -128,12 +121,7 @@ export default {
       return navigator.userAgent.includes('Mobile')
     },
     hasReviwed() {
-      return (
-        this.selectedPlace &&
-        this.selectedPlace.reviews.some(
-          el => el.email === this.$store.state.user
-        )
-      )
+      return this.reviews.some(el => el.email === this.$store.state.user)
     }
   },
   components: {
@@ -156,6 +144,7 @@ export default {
       places: [],
       selectedComponent: 'search',
       selectedPlace: '',
+      reviews: [],
       rating: 1,
       comment: '',
       searchLoading: false,
@@ -190,7 +179,7 @@ export default {
               el => el.placeId === this.selectedPlace.id
             )
           )
-            this.selectedPlace.reviews = data.avaliationAdded
+            this.reviews = data.avaliationAdded
         }
       }
     }
@@ -270,7 +259,7 @@ export default {
           }
         })
         .finally(() => {
-          this.$refs.reviewForm.reset()
+          if (this.user && !this.hasReviwed) this.$refs.reviewForm.reset()
           this.dialogLoading = false
         })
     },
@@ -296,7 +285,7 @@ export default {
         })
         .then(({ data }) => {
           this.selectedPlace = place
-          this.selectedPlace.reviews = data.getAvaliations
+          this.reviews = data.getAvaliations
           this.placeDialog = true
         })
         .catch(err => {
