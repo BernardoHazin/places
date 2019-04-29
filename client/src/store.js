@@ -10,6 +10,7 @@ export default new Vuex.Store({
     email: '',
     name: '',
     profileImg: '',
+    favorites: [],
     token: '',
     sideComponent: 'search'
   },
@@ -17,16 +18,18 @@ export default new Vuex.Store({
     setSideComponent(state, component) {
       state.sideComponent = component
     },
-    login(state, { email, token, profileImg, name }) {
+    login(state, { email, token, profileImg, name, favorites }) {
       state.email = email
       state.name = name
       state.token = token
       state.profileImg = profileImg
+      state.favorites = favorites
       state.sideComponent = 'search'
     },
     logout(state) {
       state.email = ''
       state.token = ''
+      state.favorites = []
       state.sideComponent = 'search'
     },
     setName(state, name) {
@@ -34,6 +37,14 @@ export default new Vuex.Store({
     },
     setToken(state, token) {
       state.token = token
+    },
+    addFavorite(state, place) {
+      console.log('Add')
+      state.favorites.push(place)
+    },
+    removeFavorite(state, index) {
+      console.log('Remove', state.favorites, index)
+      state.favorites.splice(index, 1)
     }
   },
   actions: {
@@ -51,6 +62,12 @@ export default new Vuex.Store({
     },
     setToken({ commit }, token) {
       commit('setToken', token)
+    },
+    addFavorite({ commit }, id) {
+      commit('addFavorite', id)
+    },
+    removeFavorite({ commit }, id) {
+      commit('removeFavorite', id)
     }
   },
   getters: {

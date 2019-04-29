@@ -67,9 +67,15 @@ export default {
                   name
                   token
                   profileImg
+                  favorites {
+                    placeId
+                    placeName
+                    placeIcon
+                  }
                 }
               }
             `,
+            fetchPolicy: 'no-cache',
             variables: {
               accessToken: authResponse.accessToken
             }
@@ -110,15 +116,22 @@ export default {
                 name
                 token
                 profileImg
+                favorites {
+                  placeId
+                  placeName
+                  placeIcon
+                }
               }
             }
           `,
+          fetchPolicy: 'no-cache',
           variables: {
             email: this.email,
             password: this.password
           }
         })
         .then(({ data }) => {
+          console.log(data)
           this.$store.dispatch('login', data.login)
         })
         .catch(err => {

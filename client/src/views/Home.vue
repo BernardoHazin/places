@@ -22,7 +22,11 @@
         <search
           key="1"
           v-if="$store.state.sideComponent === 'search'"
-          :places="places.filter(el => el.name)"
+          :places="
+            places.filter(el => el.name).length
+              ? places.filter(el => el.name)
+              : favorites
+          "
           :searchLoading="searchLoading"
           @search="getPlace"
           @setPlace="setPlace"
@@ -122,6 +126,13 @@ export default {
     },
     hasReviwed() {
       return this.reviews.some(el => el.email === this.$store.state.email)
+    },
+    favorites() {
+      return this.$store.state.favorites.map(el => ({
+        id: el.placeId,
+        name: el.placeName,
+        icon: el.placeIcon
+      }))
     }
   },
   components: {

@@ -12,6 +12,11 @@ type Mutation {
   changeName(name: String!): User!
   changePasswordRequest: String!
   changePassword(password: String!, newPassword: String!): String!
+  setFavorite(
+    placeId: String!
+    placeName: String!
+    placeIcon: String!
+  ): Favorite!
   addAvaliation(
     placeId: String!
     userEmail: String!
@@ -31,6 +36,7 @@ type User {
   profileImg: String!
   createdAt: String!
   updatedAt: String!
+  favorites: [Favorite]!
 }
 
 type Place {
@@ -53,4 +59,10 @@ type Avaliation {
   profileImg: String
   rating: Int
   comment: String
+}
+
+type Favorite {
+  placeId: String
+  placeName: String
+  placeIcon: String
 }
