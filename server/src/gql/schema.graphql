@@ -2,9 +2,9 @@ scalar JSON
 
 type Query {
   getPlace(place: String!, radius: Int!, lat: Float, lng: Float): [Place]
+  getAvaliations(placeId: String!): [Avaliation]
   login(email: String!, password: String!): User!
   fbLogin(accessToken: String!): User!
-  getAvaliations(placeId: String!): [Avaliation]
 }
 
 type Mutation {
@@ -12,11 +12,7 @@ type Mutation {
   changeName(name: String!): User!
   changePasswordRequest: String!
   changePassword(password: String!, newPassword: String!): String!
-  setFavorite(
-    placeId: String!
-    placeName: String!
-    placeIcon: String!
-  ): Favorite!
+  setFavorite(placeId: String!, placeName: String!, placeIcon: String!): String!
   addAvaliation(
     placeId: String!
     userEmail: String!

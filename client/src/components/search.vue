@@ -94,11 +94,7 @@ export default {
                 placeId: $placeId
                 placeName: $placeName
                 placeIcon: $placeIcon
-              ) {
-                placeId
-                placeName
-                placeIcon
-              }
+              )
             }
           `,
           variables: {

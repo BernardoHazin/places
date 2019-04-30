@@ -8,6 +8,10 @@ const nodemailer = require('nodemailer')
 
 const pubsub = new PubSub()
 
+/**
+ * @args id => signed token containing the user id
+ * @description returns change password email html
+ */
 const changePasswordHtml = id => `
   <html>
     <head>
@@ -47,25 +51,38 @@ const emailRegex = new RegExp(
   /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
 )
 
+/**
+ * @description Sets up email transporter with gmail service
+ */
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: MAIL.auth
 })
 
+/**
+ * @args id => User id
+ * @args expiration => token age in seconds
+ * @description returns change password email html
+ */
 function signJWT(id, expiration) {
   return sign({ id }, authentication.secret, {
     expiresIn: expiration || authentication.expiration
   })
 }
 
-function getReviews(models, args) {
+/**
+ * @args models => signed token containing the user id
+ * @args placeId => place's id
+ * @description reusable function for fetching a place reviews
+ */
+function getReviews(models, { placeId }) {
   return models.Avaliation.findAndCountAll({
-    where: { placeId: args.placeId },
+    where: { placeId: placeId },
     include: [{ model: models.User }]
   }).then(({ rows }) =>
     rows.map(({ User, rating, comment }) => ({
       name: User.name,
-      placeId: args.placeId,
+      placeId: placeId,
       email: User.email,
       profileImg: User.profileImg,
       rating: Number(rating),
@@ -86,10 +103,12 @@ module.exports = {
         true
       )
       return models.User.create(args)
-        .then(({ id, email, profileImg }) => ({
+        .then(({ id, email, name, profileImg }) => ({
           email,
+          name,
           profileImg,
-          token: signJWT(id)
+          token: signJWT(id),
+          favorites: []
         }))
         .catch(err => {
           console.log(err.message)
@@ -153,8 +172,11 @@ module.exports = {
         }
       }).then(([favorite, created]) => {
         console.log(created)
-        if (!created) return favorite.destroy()
-        return favorite
+        if (!created) {
+          favorite.destroy()
+          return 'Favorito removido'
+        }
+        return 'Favorito adicionado'
       })
     },
     changePassword: async (
@@ -199,7 +221,7 @@ module.exports = {
       const user = await models.User.findOne({ where: { email } })
       if (!user) return new Error('Email ou senha incorretos')
       const isPasswordValid = await user.comparePassword(password)
-      if (!isPasswordValid) new Error('Email ou senha incorretos')
+      if (!isPasswordValid) return new Error('Email ou senha incorretos')
       const favorites = await models.Favorite.findAll({
         where: { user: user.id }
       })

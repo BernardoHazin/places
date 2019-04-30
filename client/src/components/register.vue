@@ -69,8 +69,14 @@ export default {
             ) {
               registerUser(email: $email, name: $name, password: $password) {
                 email
+                name
                 token
                 profileImg
+                favorites {
+                  placeId
+                  placeName
+                  placeIcon
+                }
               }
             }
           `,
