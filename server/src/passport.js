@@ -4,6 +4,7 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const { authentication } = require('./config')
 
+/** @description sets up passport.js for user authentication with json web token */
 passport.use(
   new JwtStrategy(
     {
