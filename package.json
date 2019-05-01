@@ -1,0 +1,10 @@
+{
+  "name": "places",
+  "version": "1.0.0",
+  "repository": "https://github.com/BernardoHazin/places.git",
+  "author": "Bernardo hazin <bernardo.hazin@gmail.com>",
+  "scripts": {
+    "start": "cd client/ && yarn install && yarn build && cd ../server && yarn install && yarn serve && cd .."
+  },
+  "license": "MIT"
+}

@@ -4,8 +4,11 @@
     :column="isMobile || x < 800"
     class="home pa-2 fph"
   >
+    <!-- LEFT -->
     <v-flex xs8 class="red" style="min-height: 50vh;">
+      <!-- GOOGLE MAPS COMPONENT -->
       <GmapMap :center="position" :zoom="15" style="width: 100%; height: 100%;">
+        <!-- MAP MARKERS COMPONENTS -->
         <GmapMarker
           v-for="(m, index) in places"
           :key="index"
@@ -16,8 +19,10 @@
         />
       </GmapMap>
     </v-flex>
+    <!-- RIGHT -->
     <v-flex xs4 class="elevation-4">
       <transition name="fade" mode="out-in">
+        <!-- SEARCH COMPONENT -->
         <search
           key="1"
           v-if="$store.state.sideComponent === 'search'"
@@ -31,16 +36,19 @@
           @setPlace="setPlace"
           @info="getPlaceInfo"
         ></search>
+        <!-- LOGIN COMPONENT -->
         <login
           key="2"
           v-else-if="$store.state.sideComponent === 'login'"
         ></login>
+        <!-- REGISTER COMPONENT -->
         <register
           key="3"
           v-else-if="$store.state.sideComponent === 'register'"
         ></register>
       </transition>
     </v-flex>
+    <!-- PLACE AVALIATIONS MODAL -->
     <v-dialog v-model="placeDialog" max-width="600px" scrollable>
       <v-card class="white">
         <v-card-title
@@ -56,35 +64,43 @@
           </v-btn>
         </v-card-title>
         <v-divider />
+        <!-- LOADING COMPONENT -->
         <v-progress-linear
           v-if="dialogLoading"
           :indeterminate="true"
         ></v-progress-linear>
-        <v-list three-line v-else-if="selectedPlace && reviews.length">
+        <!-- PLACE'S AVALIATION LIST -->
+        <v-list three-line v-else-if="reviews.length">
           <v-list-tile avatar v-for="(review, i) in reviews" :key="i">
+            <!-- AVALIATION'S USER PROFILE IMAGE -->
             <v-list-tile-avatar>
               <img :src="review.profileImg" />
             </v-list-tile-avatar>
             <v-list-tile-content>
+              <!-- AVALIATION'S USER COMMENT -->
               <v-list-tile-title class="row ac">
                 {{ review.comment }}
               </v-list-tile-title>
+              <!-- AVALIATION'S PLACE RATING -->
               <v-rating
                 v-model="review.rating"
                 small
                 color="primary"
                 readonly
               ></v-rating>
+              <!-- AVALIATION'S USER NAME -->
               <v-list-tile-sub-title>
                 {{ review.name }}
               </v-list-tile-sub-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
+        <!-- COMPONENT TO BE SHOWN WHEN NO AVALIATION HAVE BEEN FOUND -->
         <div v-else class="pa-4 fs-2">
           Nenhum review encontrado :/
         </div>
         <v-card-actions>
+          <!-- CREATE AVALIATION FORM, ONLY SHOWN WHEN THE USER HAVE NOT EVALUATED YET -->
           <v-form ref="reviewForm" class="fpw col" v-if="email && !hasReviwed">
             <v-text-field v-model="comment" label="Comentário"></v-text-field>
             <div class="row">
