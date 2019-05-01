@@ -1,1 +1,1 @@
-web: npm run setup
+web: yarn start
