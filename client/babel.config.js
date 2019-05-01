@@ -7,6 +7,7 @@ module.exports = {
       }
     ]
   ],
+  /* Remove console logs */
   plugins:
     process.env.NODE_ENV === 'production' ? ['transform-remove-console'] : []
 }

@@ -39,11 +39,11 @@
 </template>
 
 <script>
-import { setSideComponent, setUser, logout } from '@/mixins'
+import { setSideComponent, logout } from '@/mixins'
 import gql from 'graphql-tag'
 
 export default {
-  mixins: [setSideComponent, setUser, logout],
+  mixins: [setSideComponent, logout],
   data() {
     return {
       loading: false,

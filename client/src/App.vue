@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <v-app>
+      <!-- NOTIFICATION COMPONENT -->
       <notifications
         :classes="'notification'"
         color="red"
@@ -8,11 +9,20 @@
         :duration="6000"
       />
       <v-toolbar>
-        <img style="cursor: pointer;" @click="$router.push({ name: 'home' })" alt="Places logo" class="logo-img" src="./assets/logo.png" />
+        <!-- NAVBAR LOGO -->
+        <img
+          style="cursor: pointer;"
+          @click="$router.push({ name: 'home' })"
+          alt="Places logo"
+          class="logo-img"
+          src="./assets/logo.png"
+        />
+        <!-- NAVBAR TITLE -->
         <v-toolbar-title class="hidden-sm-and-down">
           Places <span v-if="email">- {{ name }}</span>
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <!-- NAVBAR OPTIONS -->
         <v-toolbar-items class="row ac">
           <v-btn v-if="!email" flat @click="setSideComponent('login')"
             >Entrar</v-btn
@@ -24,6 +34,7 @@
           <v-btn v-if="email" flat @click="logout">Sair</v-btn>
         </v-toolbar-items>
       </v-toolbar>
+      <!-- USER PROFILE MODAL -->
       <v-dialog v-model="profileDialog" max-width="600px" persistent>
         <profile
           :email="email"
@@ -32,19 +43,20 @@
           @close="profileDialog = false"
         />
       </v-dialog>
+      <!-- ROUTER INJECTION -->
       <router-view />
     </v-app>
   </div>
 </template>
 
 <script>
-import { setSideComponent, setUser, logout } from '@/mixins'
+import { setSideComponent, logout } from '@/mixins'
 import profile from './components/profile'
 import { mapState } from 'vuex'
 import gql from 'graphql-tag'
 
 export default {
-  mixins: [setSideComponent, setUser, logout],
+  mixins: [setSideComponent, logout],
   components: {
     profile
   },
