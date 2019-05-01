@@ -19,6 +19,7 @@
     "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
+    "@vue/cli": "^3.7.0",
     "@vue/cli-plugin-babel": "^3.6.0",
     "@vue/cli-service": "^3.6.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
