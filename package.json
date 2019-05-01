@@ -4,7 +4,8 @@
   "repository": "https://github.com/BernardoHazin/places.git",
   "author": "Bernardo hazin <bernardo.hazin@gmail.com>",
   "scripts": {
-    "start": "cd client/ && npm install && npm run build && cd ../server && npm install && npm run serve && cd .."
+    "setup": "npm i -g yarn @vue/cli && yarn start",
+    "start": "cd client/ && yarn install && yarn build && cd ../server && yarn install && yarn serve && cd .."
   },
   "license": "MIT"
 }
